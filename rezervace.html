@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervace — Michal Šmíd Fotbalový trenér</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1a7a4a;
+    --green-dark: #146038;
+    --green-light: #e8f5ee;
+    --green-mid: #d0ead9;
+    --dark: #0f1f14;
+    --white: #ffffff;
+    --gray-50: #f8f9f8;
+    --gray-100: #f0f2f0;
+    --gray-200: #e2e8e2;
+    --gray-400: #8a9e8a;
+    --gray-600: #4a5e4a;
+    --gray-800: #1e2e1e;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-sm: 0 1px 4px rgba(15,31,20,0.07);
+    --shadow-md: 0 4px 20px rgba(15,31,20,0.1);
+    --shadow-lg: 0 12px 40px rgba(15,31,20,0.14);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; color: var(--gray-800); background: var(--white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  /* ─── NAV ─── */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--gray-200); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 66px; }
+  .nav-logo { text-decoration: none; }
+  .nav-logo-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); display: block; line-height: 1.15; }
+  .nav-logo-title { font-size: 0.7rem; font-weight: 500; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; display: block; }
+  .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--gray-600); transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--green); }
+  .nav-cta { background: var(--green); color: var(--white) !important; padding: 0.55rem 1.25rem; border-radius: var(--radius-md); font-weight: 600 !important; transition: background 0.2s !important; }
+  .nav-cta:hover { background: var(--green-dark) !important; }
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+  .nav-hamburger span { width: 22px; height: 2px; background: var(--dark); border-radius: 2px; display: block; }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header { background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 110px 5% 70px; }
+  .page-eyebrow { font-size: 0.75rem; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); color: var(--dark); line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .page-header p { font-size: 1rem; color: var(--gray-600); max-width: 520px; line-height: 1.75; }
+
+  /* ─── SECTIONS ─── */
+  .section { padding: 80px 5%; }
+  .section-alt { background: var(--gray-50); }
+  .section-eyebrow { font-size: 0.75rem; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--dark); line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .section-sub { font-size: 1rem; color: var(--gray-600); max-width: 520px; line-height: 1.7; }
+  .section-header { margin-bottom: 3rem; }
+  .section-header.center { text-align: center; }
+  .section-header.center .section-sub { margin: 0 auto; }
+
+  /* ─── KROKY ─── */
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; position: relative; margin-bottom: 4rem; }
+  .steps-grid::before { content: ''; position: absolute; top: 28px; left: calc(100%/6); right: calc(100%/6); height: 1px; background: var(--gray-200); }
+  .step { text-align: center; position: relative; }
+  .step-num { width: 56px; height: 56px; border-radius: 50%; background: var(--white); border: 2px solid var(--green); color: var(--green); font-family: 'Playfair Display', serif; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+  .step h3 { font-size: 1rem; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; }
+  .step p { font-size: 0.875rem; color: var(--gray-600); line-height: 1.65; }
+
+  /* ─── FORMULÁŘ + POSTRANNÍ PANEL ─── */
+  .rezervace-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 3rem; align-items: start; }
+
+  /* formulář */
+  .form-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: 2.5rem; box-shadow: var(--shadow-sm); }
+  .form-card h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--dark); margin-bottom: 0.35rem; }
+  .form-card > p { font-size: 0.875rem; color: var(--gray-600); margin-bottom: 2rem; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 0.875rem; color: var(--gray-800); font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s, background 0.2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); background: var(--white); }
+  .form-group textarea { height: 100px; resize: none; }
+  .form-group input[type="date"] { cursor: pointer; }
+
+  .form-section-label { font-size: 0.7rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.1em; margin: 1.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--gray-100); }
+
+  .form-gdpr { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 1.5rem; }
+  .form-gdpr input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--green); flex-shrink: 0; cursor: pointer; }
+  .form-gdpr label { font-size: 0.8rem; color: var(--gray-600); line-height: 1.5; cursor: pointer; }
+  .form-gdpr a { color: var(--green); text-decoration: none; }
+
+  .form-submit { width: 100%; background: var(--green); color: var(--white); border: none; padding: 0.95rem; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(26,122,74,0.25); }
+  .form-submit:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+  .form-success { display: none; text-align: center; padding: 3rem 1rem; }
+  .form-success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1.25rem; }
+  .form-success h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 0.5rem; }
+  .form-success p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; }
+
+  /* postranní panel */
+  .side-panel { display: flex; flex-direction: column; gap: 1.25rem; position: sticky; top: 82px; }
+
+  .side-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; }
+  .side-card h3 { font-size: 0.875rem; font-weight: 600; color: var(--dark); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--gray-100); }
+
+  .contact-item { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.85rem; }
+  .contact-item:last-child { margin-bottom: 0; }
+  .contact-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+  .contact-label { font-size: 0.7rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 0.1rem; }
+  .contact-value { font-size: 0.875rem; font-weight: 500; color: var(--dark); text-decoration: none; display: block; }
+  .contact-value:hover { color: var(--green); }
+
+  .terms-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+  .terms-list li { display: flex; gap: 0.6rem; font-size: 0.825rem; color: var(--gray-600); line-height: 1.5; }
+  .terms-list li::before { content: '·'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+  .terminy-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .termin-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); }
+  .termin-item:last-child { border-bottom: none; }
+  .termin-day { font-weight: 500; color: var(--dark); }
+  .termin-time { color: var(--green); font-weight: 500; font-size: 0.8rem; }
+
+  /* ─── CO VZÍT ─── */
+  .bring-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .bring-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.25rem; text-align: center; }
+  .bring-icon { font-size: 1.75rem; margin-bottom: 0.6rem; display: block; }
+  .bring-card h4 { font-size: 0.875rem; font-weight: 600; color: var(--dark); margin-bottom: 0.25rem; }
+  .bring-card p { font-size: 0.775rem; color: var(--gray-400); line-height: 1.5; }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary { display: inline-block; background: var(--green); color: var(--white); padding: 0.85rem 1.75rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: background 0.2s, transform 0.15s; border: none; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+  .btn-white { display: inline-block; background: var(--white); color: var(--dark); padding: 0.85rem 1.75rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: background 0.2s, transform 0.15s; }
+  .btn-white:hover { background: var(--gray-100); transform: translateY(-2px); }
+  .btn-outline-white { display: inline-block; background: transparent; color: rgba(255,255,255,0.8); padding: 0.85rem 1.75rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 500; text-decoration: none; border: 1px solid rgba(255,255,255,0.25); transition: border-color 0.2s, color 0.2s; }
+  .btn-outline-white:hover { border-color: rgba(255,255,255,0.6); color: var(--white); }
+
+  /* ─── CTA ─── */
+  .cta-box { background: var(--dark); border-radius: var(--radius-xl); padding: 3.5rem; text-align: center; position: relative; overflow: hidden; }
+  .cta-box::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 300px; height: 300px; border-radius: 50%; background: rgba(26,122,74,0.15); }
+  .cta-box h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); color: var(--white); margin-bottom: 0.85rem; position: relative; z-index: 1; }
+  .cta-box p { font-size: 0.95rem; color: rgba(255,255,255,0.55); max-width: 460px; margin: 0 auto 2rem; line-height: 1.7; position: relative; z-index: 1; }
+  .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+  /* ─── FOOTER ─── */
+  footer { background: var(--dark); padding: 3rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+  .footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .footer-logo-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); margin-bottom: 0.25rem; }
+  .footer-logo-title { font-size: 0.75rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.85rem; }
+  .footer-brand p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.7; max-width: 260px; }
+  .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+  .footer-col a { display: block; font-size: 0.875rem; color: rgba(255,255,255,0.55); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--white); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: rgba(255,255,255,0.25); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .bring-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 1.25rem; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 66px; left: 0; right: 0; background: rgba(255,255,255,0.98); padding: 1rem 1.25rem; gap: 0.75rem; border-bottom: 1px solid var(--gray-200); z-index: 99; }
+    .nav-links.open { display: flex; }
+    .nav-hamburger { display: flex; }
+    .page-header { padding: 90px 1.25rem 50px; }
+    .section { padding: 60px 1.25rem; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .steps-grid::before { display: none; }
+    .step { text-align: left; display: flex; gap: 1.25rem; align-items: flex-start; }
+    .step-num { margin: 0; flex-shrink: 0; width: 44px; height: 44px; }
+    .rezervace-grid { grid-template-columns: 1fr; }
+    .side-panel { position: static; }
+    .form-row { grid-template-columns: 1fr; }
+    .bring-grid { grid-template-columns: repeat(2, 1fr); }
+    .cta-box { padding: 2.5rem 1.5rem; }
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-name">Michal Šmíd</span>
+    <span class="nav-logo-title">Fotbalový trenér</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="o-mne.html">O mně</a></li>
+    <li><a href="sluzby.html">Služby & Ceník</a></li>
+    <li><a href="rezervace.html" class="active">Rezervace</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+    <li><a href="rezervace.html" class="nav-cta">Rezervovat trénink</a></li>
+  </ul>
+  <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-eyebrow">Rezervace</div>
+  <h1>Rezervujte trénink</h1>
+  <p>Vyplňte formulář a ozvu se vám do 24 hodin s potvrzením termínu. První trénink je zkušební — bez závazků.</p>
+</div>
+
+<!-- KROKY -->
+<section class="section section-alt">
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Vyplňte formulář</h3>
+      <p>Zadejte informace o dítěti, typ tréninku a preferovaný termín. Pošlete formulář.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Potvrdím termín</h3>
+      <p>Do 24 hodin vás kontaktuji a potvrdím termín nebo navrhnu alternativu.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Přijďte trénovat</h3>
+      <p>Dostavte se na hřiště ve sjednaný čas. Vybavení zajistím já.</p>
+    </div>
+  </div>
+
+  <!-- FORMULÁŘ + SIDE PANEL -->
+  <div class="rezervace-grid">
+
+    <!-- FORMULÁŘ -->
+    <div class="form-card">
+      <h2>Rezervační formulář</h2>
+      <p>Vyplňte prosím všechna povinná pole označená *</p>
+
+      <div id="rezervaceForm">
+        <div class="form-section-label">Kontaktní údaje rodiče</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jméno a příjmení *</label>
+            <input type="text" id="parentName" placeholder="Jana Nováková">
+          </div>
+          <div class="form-group">
+            <label>Telefon *</label>
+            <input type="tel" id="phone" placeholder="+420 777 000 000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" placeholder="jana@email.cz">
+        </div>
+
+        <div class="form-section-label">Informace o dítěti</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jméno dítěte *</label>
+            <input type="text" id="childName" placeholder="Tomáš">
+          </div>
+          <div class="form-group">
+            <label>Věk dítěte *</label>
+            <input type="number" min="6" max="14" placeholder="8">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Zkušenosti s fotbalem *</label>
+          <select id="experience">
+            <option value="">Vyberte...</option>
+            <option>Začátečník — fotbal teprve zkouší</option>
+            <option>Hraje v klubu — chce se zlepšit</option>
+            <option>Pokročilý — pravidelně trénuje</option>
+          </select>
+        </div>
+
+        <div class="form-section-label">Typ tréninku a termín</div>
+        <div class="form-group">
+          <label>Typ tréninku *</label>
+          <select id="type">
+            <option value="">Vyberte...</option>
+            <option>Individuální trénink (1 hráč)</option>
+            <option>Trénink ve dvou (2 hráči)</option>
+            <option>Balíček 5 tréninků</option>
+            <option>Balíček 10 tréninků</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preferovaný termín</label>
+            <input type="date" id="date1">
+          </div>
+          <div class="form-group">
+            <label>Alternativní termín</label>
+            <input type="date" id="date2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Zpráva nebo dotaz</label>
+          <textarea placeholder="Například: Syn hraje v přípravce Meteoru a chce zlepšit střelbu..."></textarea>
+        </div>
+
+        <div class="form-gdpr">
+          <input type="checkbox" id="gdpr">
+          <label for="gdpr">Souhlasím se zpracováním osobních údajů za účelem vyřízení rezervace. *</label>
+        </div>
+
+        <button class="form-submit" onclick="submitForm()">Odeslat rezervaci →</button>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="form-success-icon">⚽</div>
+        <h3>Rezervace odeslána!</h3>
+        <p>Děkuji! Ozvu se vám do 24 hodin s potvrzením termínu. Těším se na vás a vaše dítě na hřišti!</p>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+
+      <div class="side-card">
+        <h3>Přímý kontakt</h3>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <span class="contact-label">Telefon / WhatsApp</span>
+            <a href="tel:+420000000000" class="contact-value">+420 XXX XXX XXX</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <span class="contact-label">E-mail</span>
+            <a href="mailto:michal@smid-trener.cz" class="contact-value">michal@smid-trener.cz</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <span class="contact-label">Místo tréninků</span>
+            <span class="contact-value" style="cursor:default;">Hřiště SK Meteor, Kostelní Hlavno</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h3>Dostupné termíny</h3>
+        <ul class="terminy-list">
+          <li class="termin-item">
+            <span class="termin-day">[Den 1]</span>
+            <span class="termin-time">[čas]</span>
+          </li>
+          <li class="termin-item">
+            <span class="termin-day">[Den 2]</span>
+            <span class="termin-time">[čas]</span>
+          </li>
+          <li class="termin-item">
+            <span class="termin-day">[Den 3]</span>
+            <span class="termin-time">[čas]</span>
+          </li>
+        </ul>
+        <p style="font-size:0.775rem;color:var(--gray-400);margin-top:0.85rem;">Termíny dle domluvy — napište mi a domluvíme se flexibilně.</p>
+      </div>
+
+      <div class="side-card">
+        <h3>Zásady rezervace</h3>
+        <ul class="terms-list">
+          <li>Zrušení nejpozději 24 hodin předem — zdarma</li>
+          <li>Pozdější zrušení — účtuje se plná cena</li>
+          <li>Špatné počasí — náhradní termín zdarma</li>
+          <li>Jednotlivé tréninky — platba hotově na místě</li>
+          <li>Balíčky — platba převodem před prvním tréninkem</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CO VZÍT S SEBOU -->
+<section class="section">
+  <div class="section-header center">
+    <div class="section-eyebrow">Před prvním tréninkem</div>
+    <h2 class="section-title">Co vzít s sebou</h2>
+    <p class="section-sub">Vybavení zajistím já — dítě potřebuje jen základní výbavu.</p>
+  </div>
+  <div class="bring-grid">
+    <div class="bring-card">
+      <span class="bring-icon">👟</span>
+      <h4>Kopačky nebo tenisky</h4>
+      <p>Dle povrchu — na trávu kopačky, na tvrdý povrch tenisky</p>
+    </div>
+    <div class="bring-card">
+      <span class="bring-icon">👕</span>
+      <h4>Sportovní oblečení</h4>
+      <p>Pohodlné, přizpůsobené počasí</p>
+    </div>
+    <div class="bring-card">
+      <span class="bring-icon">💧</span>
+      <h4>Láhev s vodou</h4>
+      <p>Hydratace je důležitá — zejména v létě</p>
+    </div>
+    <div class="bring-card">
+      <span class="bring-icon">😊</span>
+      <h4>Dobrou náladu</h4>
+      <p>To nejdůležitější — chuť se učit a bavit se fotbalem</p>
+    </div>
+  </div>
+  <div style="background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-top:1.5rem;display:flex;gap:0.85rem;align-items:flex-start;max-width:600px;margin-left:auto;margin-right:auto;">
+    <span style="font-size:1.25rem;flex-shrink:0;">⚽</span>
+    <div>
+      <div style="font-size:0.875rem;font-weight:600;color:var(--green-dark);margin-bottom:0.2rem;">Vybavení zajistím já</div>
+      <div style="font-size:0.825rem;color:var(--gray-600);">Míče, kužele, tyče a veškeré pomůcky mám připravené. Dítě přijde jen ve sporťáku.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="cta-box">
+    <h2>Máte otázky před rezervací?</h2>
+    <p>Zavolejte nebo napište — rád zodpovím cokoliv. Nejrychlejší cesta je WhatsApp nebo telefon.</p>
+    <div class="cta-btns">
+      <a href="tel:+420000000000" class="btn-white">+420 XXX XXX XXX</a>
+      <a href="kontakt.html" class="btn-outline-white">Napsat zprávu</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo-name">Michal Šmíd</div>
+      <div class="footer-logo-title">Fotbalový trenér · FAČR C licence</div>
+      <p>Individuální fotbalové tréninky pro děti 6–14 let. Kostelní Hlavno a okolí Brandýsa nad Labem.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigace</h4>
+      <a href="o-mne.html">O mně</a>
+      <a href="sluzby.html">Služby & Ceník</a>
+      <a href="rezervace.html">Rezervace</a>
+      <a href="kontakt.html">Kontakt</a>
+    </div>
+    <div class="footer-col">
+      <h4>Kontakt</h4>
+      <a href="tel:+420000000000">+420 XXX XXX XXX</a>
+      <a href="mailto:michal@smid-trener.cz">michal@smid-trener.cz</a>
+      <a href="#">Kostelní Hlavno</a>
+      <a href="#">Brandýs n.L. a okolí</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Michal Šmíd — Fotbalový trenér</span>
+    <span>GDPR · Ochrana osobních údajů</span>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    const links = document.querySelector('.nav-links');
+    links.classList.toggle('open');
+  }
+
+  function submitForm() {
+    const name = document.getElementById('parentName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const childName = document.getElementById('childName').value.trim();
+    const experience = document.getElementById('experience').value;
+    const type = document.getElementById('type').value;
+    const gdpr = document.getElementById('gdpr').checked;
+
+    if (!name || !phone || !childName || !experience || !type || !gdpr) {
+      alert('Vyplňte prosím všechna povinná pole a potvrďte souhlas s GDPR.');
+      return;
+    }
+
+    document.getElementById('rezervaceForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('date1').min = today;
+  document.getElementById('date2').min = today;
+</script>
+
+</body>
+</html>
